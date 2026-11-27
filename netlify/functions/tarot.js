@@ -21,41 +21,53 @@ exports.handler = async function (event) {
       (bodyData.contents && JSON.stringify(bodyData.contents)) ||
       JSON.stringify(bodyData);
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: promptText }] }],
-        }),
+    const models = ["gemini-3.8-flash", "gemini-3.8-flash-lite"];
+    let lastError = "AI 서버 응답이 지연되고 있습니다.";
+
+    for (const model of models) {
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: promptText }] }],
+            }),
+          }
+        );
+
+        const data = await response.json();
+
+        if (response.ok && data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+          const resultText = data.candidates[0].content.parts[0].text;
+          return {
+            statusCode: 200,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              result: resultText,
+              text: resultText,
+              candidates: data.candidates,
+            }),
+          };
+        }
+
+        lastError = data.error?.message || `모델(${model}) 호출 실패`;
+      } catch (err) {
+        lastError = err.message;
       }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return {
-        statusCode: response.status,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ error: data.error?.message || "API 호출 실패" }),
-      };
     }
 
-    const text =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "해석을 생성하지 못했습니다.";
-
     return {
-      statusCode: 200,
+      statusCode: 503,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ result: text, text: text, reading: text, response: text }),
+      body: JSON.stringify({ error: lastError }),
     };
-  } catch (err) {
+  } catch (error) {
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: err.message }),
+      body: JSON.stringify({ error: error.message }),
     };
   }
 };
