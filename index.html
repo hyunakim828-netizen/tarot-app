@@ -122,14 +122,9 @@
           <p class="text-[10px] text-purple-300/70">78 ARCANA TAROT</p>
         </div>
       </div>
-
-      <div class="flex items-center gap-2">
-        <button onclick="openShopModal()" class="flex items-center gap-1.5 bg-purple-950/90 gold-border px-3 py-1.5 rounded-full text-xs font-semibold hover:bg-purple-900 transition">
-          <span class="text-amber-400">✨</span>
-          <span id="coin-balance" class="text-amber-200">100</span>
-          <span class="bg-amber-500 text-slate-950 text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-0.5">+충전</span>
-        </button>
-      </div>
+      <span class="text-[11px] px-2.5 py-1 rounded-full bg-purple-950/90 border border-amber-400/30 text-amber-200 font-semibold">
+        FREE · 광고 후원 리딩
+      </span>
     </div>
   </header>
 
@@ -245,6 +240,9 @@
       <button onclick="goToStep2()" class="w-full py-4 rounded-xl shimmer-btn text-slate-950 font-bold text-base shadow-lg shadow-amber-500/20 active:scale-[0.99] transition">
         78장 셔플하고 운명 확인하기 🔮
       </button>
+
+      <!-- [광고 자리 1: 첫 화면 하단 배너] 나중에 카카오 애드핏이나 애드센스 배너 코드를 이 아래 div 안에 붙여넣으세요 -->
+      <div id="ad-banner-home" class="w-full flex justify-center"></div>
     </section>
 
     <section id="step-2" class="hidden space-y-4">
@@ -315,11 +313,8 @@
             <b class="text-amber-300">현재 흐름, 숨은 변수, 현실 행동 가이드</b>를 길고 상세하게 분석합니다.
           </p>
           <div class="space-y-2 pt-1">
-            <button onclick="unlockWithCoins()" class="w-full py-3 rounded-xl shimmer-btn text-slate-950 font-bold text-xs shadow-md">
-              ✨ 별빛 코인 30개로 심층 해석 열기
-            </button>
-            <button onclick="watchAdToUnlock()" class="w-full py-2.5 rounded-xl bg-purple-900/80 border border-purple-400/30 text-purple-200 font-semibold text-xs hover:bg-purple-800">
-              🎬 짧은 광고 보고 무료로 열기 (+50 코인 보너스)
+            <button onclick="watchAdToUnlock()" class="w-full py-3.5 rounded-xl shimmer-btn text-slate-950 font-bold text-xs shadow-md active:scale-[0.99] transition">
+              🎬 짧은 광고 보고 심층 분석 무료로 열기
             </button>
           </div>
         </div>
@@ -341,49 +336,36 @@
         </div>
       </div>
 
+      <!-- [광고 자리 2: 결과 화면 하단 배너] 나중에 카카오 애드핏이나 애드센스 배너 코드를 이 아래 div 안에 붙여넣으세요 -->
+      <div id="ad-banner-result" class="w-full flex justify-center"></div>
+
       <button onclick="resetApp()" class="w-full py-3.5 rounded-xl glass-card text-sm font-bold text-purple-200 hover:bg-purple-900/50">
         🔄 다른 질문으로 다시 보기
       </button>
     </section>
   </main>
 
-  <div id="shop-modal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-card rounded-2xl max-w-sm w-full p-5 space-y-4 border border-amber-400/40">
+  <!-- 심층 분석 잠금 해제용 광고 팝업 -->
+  <div id="ad-overlay" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl max-w-sm w-full p-5 text-center space-y-4 border border-amber-400/40">
       <div class="flex items-center justify-between">
-        <h3 class="font-bold text-base gold-text">✨ 별빛 코인 충전소</h3>
-        <button onclick="closeShopModal()" class="text-purple-300 hover:text-white text-lg">✕</button>
+        <span class="text-xs font-bold text-amber-300">🎬 스폰서 광고 후원</span>
+        <span class="text-[11px] text-purple-300">무료 심층 리딩 제공</span>
       </div>
-      <div class="space-y-2.5">
-        <button onclick="watchAdBonus()" class="w-full p-3.5 rounded-xl bg-purple-900/70 border border-purple-400/40 flex items-center justify-between hover:bg-purple-800">
-          <div class="text-left">
-            <div class="text-xs font-bold text-white">🎬 무료 광고 시청 보상</div>
-            <div class="text-[11px] text-purple-300">3초 시청 후 즉시 지급</div>
-          </div>
-          <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold text-xs">+50 코인</span>
-        </button>
-        <button onclick="buyCoins(300, '3,300원')" class="w-full p-3.5 rounded-xl glass-card flex items-center justify-between hover:border-amber-400">
-          <div class="text-left">
-            <div class="text-xs font-bold text-amber-200">✨ 별빛 코인 300개</div>
-            <div class="text-[11px] text-purple-300">심층 리딩 10회 이용권</div>
-          </div>
-          <span class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold text-xs">₩3,300</span>
-        </button>
-        <button onclick="buyCoins(1000, '8,900원')" class="w-full p-3.5 rounded-xl glass-card border-amber-400/50 flex items-center justify-between hover:border-amber-400">
-          <div class="text-left">
-            <div class="text-xs font-bold text-amber-200">👑 VIP 무제한 패스 + 1,000코인</div>
-            <div class="text-[11px] text-purple-300">인기 상품 · 광고 제거 포함</div>
-          </div>
-          <span class="px-3 py-1.5 rounded-lg shimmer-btn text-slate-950 font-bold text-xs">₩8,900</span>
-        </button>
-      </div>
-    </div>
-  </div>
 
-  <div id="ad-overlay" class="fixed inset-0 z-50 hidden bg-black/90 flex flex-col items-center justify-center p-6 text-center space-y-4">
-    <div class="text-4xl">🎬</div>
-    <h3 class="text-base font-bold text-white">스폰서 광고 시청 중...</h3>
-    <p class="text-xs text-purple-300">보상 확인 후 리딩이 자동으로 열립니다.</p>
-    <div class="text-2xl font-bold text-amber-400" id="ad-timer">3</div>
+      <!-- [광고 자리 3: 심층 분석 열기 팝업 광고 박스] 카카오 애드핏(300x250 또는 320x100) 코드를 아래 div 안에 붙여넣으세요 -->
+      <div id="ad-modal-slot" class="min-h-[160px] rounded-xl bg-slate-950/90 border border-purple-500/25 flex flex-col items-center justify-center p-4 space-y-2">
+        <div class="text-3xl">🌙</div>
+        <p class="text-xs font-semibold text-purple-100">달빛 타로 무료 심층 리딩 후원 광고</p>
+        <p class="text-[11px] text-purple-300/75">잠시 후 800~1,100자 상세 타로 풀이가 열립니다</p>
+      </div>
+
+      <div class="text-sm font-bold text-amber-300" id="ad-timer-text">5초 후 심층 분석이 자동으로 열립니다</div>
+
+      <button type="button" id="ad-cancel-btn" class="w-full py-2.5 rounded-xl bg-purple-950/80 border border-purple-400/25 text-xs text-purple-300 hover:text-white">
+        닫기
+      </button>
+    </div>
   </div>
 
   <script>
@@ -643,7 +625,6 @@
     ];
 
     let state = {
-      coins: 100,
       mode: 'love',
       category: '그 사람의 속마음',
       persona: '루나',
@@ -651,6 +632,8 @@
       deck: [],
       picked: []
     };
+
+    let activeAdInterval = null;
 
     function getSpreadConfig() {
       return TOPIC_SPREADS[state.category] || TOPIC_SPREADS['그 사람의 속마음'];
@@ -747,40 +730,44 @@
         .trim();
     }
 
-    function updateCoins(amount) {
-      state.coins += amount;
-      document.getElementById('coin-balance').textContent = state.coins;
-    }
-    function openShopModal() { document.getElementById('shop-modal').classList.remove('hidden'); }
-    function closeShopModal() { document.getElementById('shop-modal').classList.add('hidden'); }
-    function buyCoins(amount, price) {
-      updateCoins(amount);
-      closeShopModal();
-      alert(`✨ 테스트 결제 완료! (${price})\n별빛 코인 ${amount}개가 충전되었습니다.`);
-    }
-
-    function runAdSimulation(callback) {
+    function runAdAndUnlock(callback) {
       const overlay = document.getElementById('ad-overlay');
-      const timerEl = document.getElementById('ad-timer');
+      const timerText = document.getElementById('ad-timer-text');
+      const cancelBtn = document.getElementById('ad-cancel-btn');
+
+      if (activeAdInterval) {
+        clearInterval(activeAdInterval);
+        activeAdInterval = null;
+      }
+
       overlay.classList.remove('hidden');
-      let sec = 3;
-      timerEl.textContent = sec;
-      const interval = setInterval(() => {
-        sec--;
-        if (sec > 0) timerEl.textContent = sec;
-        else {
-          clearInterval(interval);
+      let sec = 5;
+      timerText.textContent = `${sec}초 후 심층 분석이 자동으로 열립니다`;
+
+      activeAdInterval = setInterval(() => {
+        sec -= 1;
+        if (sec > 0) {
+          timerText.textContent = `${sec}초 후 심층 분석이 자동으로 열립니다`;
+        } else {
+          clearInterval(activeAdInterval);
+          activeAdInterval = null;
           overlay.classList.add('hidden');
           callback();
         }
       }, 1000);
+
+      cancelBtn.onclick = () => {
+        if (activeAdInterval) {
+          clearInterval(activeAdInterval);
+          activeAdInterval = null;
+        }
+        overlay.classList.add('hidden');
+      };
     }
 
-    function watchAdBonus() {
-      closeShopModal();
-      runAdSimulation(() => {
-        updateCoins(50);
-        alert('🎉 광고 시청 보상 +50 코인이 지급되었습니다!');
+    function watchAdToUnlock() {
+      runAdAndUnlock(() => {
+        generateAIReading();
       });
     }
 
@@ -950,31 +937,14 @@
       const c2 = state.picked[1].card;
       const c3 = state.picked[2].card;
       document.getElementById('free-summary-text').innerHTML = `
-        • <b>${spread.shortSlots[0]} (${c1.name.split(' (')[0]}):</b> ${c1.isReversed ? c1.rev : c1.up}<br/>
-        • <b>${spread.shortSlots[1]} (${c2.name.split(' (')[0]}):</b> ${c2.isReversed ? c2.rev : c2.up}<br/>
-        • <b>${spread.shortSlots[2]} (${c3.name.split(' (')[0]}):</b> ${c3.isReversed ? c3.rev : c3.up}
+- <b>${spread.shortSlots[0]} (${c1.name.split(' (')[0]}):</b> ${c1.isReversed ? c1.rev : c1.up}<br/>
+- <b>${spread.shortSlots[1]} (${c2.name.split(' (')[0]}):</b> ${c2.isReversed ? c2.rev : c2.up}<br/>
+- <b>${spread.shortSlots[2]} (${c3.name.split(' (')[0]}):</b> ${c3.isReversed ? c3.rev : c3.up}
       `;
 
       document.getElementById('premium-lock-box').classList.remove('hidden');
       document.getElementById('ai-loading-box').classList.add('hidden');
       document.getElementById('ai-result-box').classList.add('hidden');
-    }
-
-    function unlockWithCoins() {
-      if (state.coins < 30) {
-        alert('별빛 코인이 부족합니다. 충전소에서 무료 광고를 보거나 코인을 충전해 주세요!');
-        openShopModal();
-        return;
-      }
-      updateCoins(-30);
-      generateAIReading();
-    }
-
-    function watchAdToUnlock() {
-      runAdSimulation(() => {
-        updateCoins(50);
-        generateAIReading();
-      });
     }
 
     async function callTarotServer(prompt) {
