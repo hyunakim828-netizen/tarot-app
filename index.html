@@ -85,31 +85,52 @@
     }
     @keyframes shimmer { to { background-position: 200% center; } }
 
-    @keyframes dynamicShuffle {
+    /* 다이나믹 소용돌이 & 3D 셔플 애니메이션 */
+    #deck-grid {
+      perspective: 1100px;
+    }
+    @keyframes dynamicSwirlShuffle {
       0% {
-        transform: translate(0, 0) rotate(0deg) scale(1);
+        transform: translate3d(0, 0, 0) rotateZ(0deg) rotateY(0deg) scale(1);
         filter: brightness(1);
       }
-      35% {
-        transform: translate(var(--tx, 0px), var(--ty, 0px)) rotate(var(--rot, 18deg)) scale(0.76);
-        filter: brightness(1.35);
-        border-color: #fde68a;
-        box-shadow: 0 0 16px rgba(251, 191, 36, 0.55);
+      22% {
+        transform: translate3d(calc(var(--cx, 0px) * 0.45), calc(var(--cy, 0px) * 0.45), 35px) rotateZ(var(--rot1, 45deg)) rotateY(180deg) scale(1.16);
+        filter: brightness(1.45);
+        border-color: #fef08a;
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.7);
       }
-      65% {
-        transform: translate(calc(var(--tx, 0px) * -0.45), calc(var(--ty, 0px) * -0.45)) rotate(calc(var(--rot, 18deg) * -0.85)) scale(1.12);
-        filter: brightness(1.2);
+      50% {
+        transform: translate3d(var(--cx, 0px), var(--cy, 0px), 70px) rotateZ(var(--rot2, 220deg)) rotateY(360deg) scale(0.84);
+        filter: brightness(1.7);
+        border-color: #fde047;
+        box-shadow: 0 0 28px rgba(245, 158, 11, 0.9);
       }
-      85% {
-        transform: translate(calc(var(--tx, 0px) * 0.14), calc(var(--ty, 0px) * 0.14)) rotate(calc(var(--rot, 18deg) * 0.25)) scale(0.97);
+      76% {
+        transform: translate3d(calc(var(--cx, 0px) * -0.18), calc(var(--cy, 0px) * -0.18), 22px) rotateZ(calc(var(--rot1, 45deg) * -0.4)) rotateY(540deg) scale(1.14);
+        filter: brightness(1.3);
+        box-shadow: 0 0 16px rgba(251, 191, 36, 0.5);
+      }
+      90% {
+        transform: translate3d(calc(var(--cx, 0px) * 0.05), calc(var(--cy, 0px) * 0.05), 0px) rotateZ(calc(var(--rot1, 45deg) * 0.1)) rotateY(720deg) scale(0.95);
       }
       100% {
-        transform: translate(0, 0) rotate(0deg) scale(1);
+        transform: translate3d(0, 0, 0) rotateZ(0deg) rotateY(720deg) scale(1);
         filter: brightness(1);
       }
     }
     .shuffling-card {
-      animation: dynamicShuffle 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      position: relative;
+      z-index: 20;
+      will-change: transform, filter;
+      animation: dynamicSwirlShuffle 1.05s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes deckAuraPulse {
+      0%, 100% { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); border-color: rgba(216, 180, 254, 0.18); }
+      50% { box-shadow: 0 0 36px rgba(251, 191, 36, 0.38); border-color: rgba(251, 191, 36, 0.65); }
+    }
+    .deck-shuffling-glow {
+      animation: deckAuraPulse 1.15s ease-in-out;
     }
   </style>
 </head>
@@ -265,7 +286,7 @@
         </div>
       </div>
 
-      <div class="glass-card rounded-2xl p-2.5 overflow-hidden">
+      <div id="deck-container" class="glass-card rounded-2xl p-2.5 overflow-hidden">
         <div class="flex items-center justify-between text-[11px] text-purple-300/80 mb-2 px-1">
           <span id="deck-guide-label">✨ 섞을 때마다 카드 번호(01~78)와 순서가 무작위로 바뀝니다</span>
           <span class="text-amber-300 font-semibold">총 78장</span>
@@ -340,7 +361,7 @@
     </section>
   </main>
 
-  <!-- 심층 분석 잠금 해제용 쿠팡 파트너스 7초 광고 팝업 -->
+  <!-- 심층 분석 잠금 해제용 쿠팡 파트너스 12초 광고 팝업 -->
   <div id="ad-overlay" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="glass-card rounded-2xl max-w-sm w-full p-5 text-center space-y-3 border border-amber-400/40">
       <div class="flex items-center justify-between">
@@ -357,7 +378,7 @@
         이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
       </p>
 
-      <div class="text-sm font-bold text-amber-300 pt-1" id="ad-timer-text">7초 후 심층 분석이 자동으로 열립니다</div>
+      <div class="text-sm font-bold text-amber-300 pt-1" id="ad-timer-text">12초 후 심층 분석이 자동으로 열립니다</div>
 
       <button type="button" id="ad-cancel-btn" class="w-full py-2.5 rounded-xl bg-purple-950/80 border border-purple-400/25 text-xs text-purple-300 hover:text-white">
         닫기
@@ -834,8 +855,14 @@
       updateSlots();
 
       const statusText = document.getElementById('shuffle-status-text');
+      const deckContainer = document.getElementById('deck-container');
       if (statusText) {
-        statusText.innerHTML = `✨ <span class="text-amber-300 font-semibold">78장의 카드가 뒤섞이며 펼쳐지는 중...</span>`;
+        statusText.innerHTML = `✨ <span class="text-amber-300 font-semibold">78장의 카드가 소용돌이치며 역동적으로 섞이는 중...</span>`;
+      }
+      if (deckContainer && animate) {
+        deckContainer.classList.remove('deck-shuffling-glow');
+        void deckContainer.offsetWidth;
+        deckContainer.classList.add('deck-shuffling-glow');
       }
 
       const shuffled = fisherYatesShuffle(FULL_78_DECK).map(card => ({
@@ -857,13 +884,17 @@
         if (animate) {
           const col = idx % 6;
           const row = Math.floor(idx / 6);
-          const offsetX = (2.5 - col) * 44 + (Math.random() * 24 - 12);
-          const offsetY = (6 - row) * 24 + (Math.random() * 24 - 12);
-          const rot = (Math.random() * 68 - 34).toFixed(1);
-          el.style.setProperty('--tx', `${offsetX}px`);
-          el.style.setProperty('--ty', `${offsetY}px`);
-          el.style.setProperty('--rot', `${rot}deg`);
-          el.style.animationDelay = `${(idx % 13) * 10}ms`;
+          const centerX = (2.5 - col) * 52 + (Math.random() * 20 - 10);
+          const centerY = (6 - row) * 48 + (Math.random() * 20 - 10);
+          const dir = idx % 2 === 0 ? 1 : -1;
+          const rot1 = (dir * (35 + Math.random() * 45)).toFixed(1);
+          const rot2 = (dir * (180 + Math.random() * 140)).toFixed(1);
+
+          el.style.setProperty('--cx', `${centerX.toFixed(1)}px`);
+          el.style.setProperty('--cy', `${centerY.toFixed(1)}px`);
+          el.style.setProperty('--rot1', `${rot1}deg`);
+          el.style.setProperty('--rot2', `${rot2}deg`);
+          el.style.animationDelay = `${(idx * 4.5).toFixed(0)}ms`;
           el.classList.add('shuffling-card');
         }
 
@@ -878,7 +909,7 @@
         if (statusText) {
           statusText.innerHTML = `전체 78장 펼침 · 선택한 카드: <span id="picked-count" class="text-amber-400 font-bold">${state.picked.length}</span> / 3장`;
         }
-      }, animate ? 860 : 0);
+      }, animate ? 1420 : 0);
     }
 
     function pickCard(idx) {
